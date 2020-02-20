@@ -1,114 +1,77 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- * @flow
- */
+import React, { Component } from 'react'
+import { StyleSheet, View, StatusBar, Image, Text } from 'react-native'
+import TabNavigator from 'react-native-tab-navigator'
+import { createStackNavigator } from 'react-navigation-stack'
+import { createAppContainer } from 'react-navigation'
+import HOME from './business/js/home/Home'
+import PERSON from './business/js/customer/Personal'
+import SEARCHPAGE from "./business/js/product/SearchPage"
+import ANIMATEDSCROLL from './business/js/AnimatedScroll'
+import PDDetail from './business/js/product/PDDetail'
 
-import React from 'react';
-import {
-  SafeAreaView,
-  StyleSheet,
-  ScrollView,
-  View,
-  Text,
-  StatusBar,
-} from 'react-native';
+const tabBars = [
+    { title: '首頁', tabIcon: require('./business/img/home.png'), selectedIcon: require('./business/img/home.png'), tag: HOME, ele: HOME },
+    { title: '发现', tabIcon: require('./business/img/search.png'), selectedIcon: require('./business/img/search.png'), tag: SEARCHPAGE, ele: SEARCHPAGE },
+    { title: '视频', tabIcon: require('./business/img/video.png'), selectedIcon: require('./business/img/video.png'), tag: ANIMATEDSCROLL, ele: ANIMATEDSCROLL },
+    { title: '個人中心', tabIcon: require('./business/img/favicon.png'), selectedIcon: require('./business/img/favicon.png'), tag: PERSON, ele: PERSON }
+]
+class AppRoute extends Component {
+    //顶部导航栏参数配置
+    static navigationOptions = {
+        headerShown: false,
+    };
+    constructor(props) {
+        super(props);
+        this.state = { selectedTab: HOME }
+    }
 
-import {
-  Header,
-  LearnMoreLinks,
-  Colors,
-  DebugInstructions,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
+    render() {
 
-const App: () => React$Node = () => {
-  return (
-    <>
-      <StatusBar barStyle="dark-content" />
-      <SafeAreaView>
-        <ScrollView
-          contentInsetAdjustmentBehavior="automatic"
-          style={styles.scrollView}>
-          <Header />
-          {global.HermesInternal == null ? null : (
-            <View style={styles.engine}>
-              <Text style={styles.footer}>Engine: Hermes</Text>
+        let tabViews = tabBars.map((item, i) => {
+            return (
+                <TabNavigator.Item
+                    selected={this.state.selectedTab === item.tag}
+                    title={item.title}
+                    renderIcon={() => <Image style={styles.tabIcon} source={item.tabIcon} />}
+                    renderSelectedIcon={() => <Image style={styles.tabIcon} source={item.selectedIcon} />}
+                    onPress={() => this.setState({ selectedTab: item.tag })} tile={item.tag} titleStyle={{ color: 'gray', fontSize: 15 }}>
+
+                    <item.ele navigation={this.props.navigation} />
+                </TabNavigator.Item>
+
+            )
+        });
+
+        return (
+            <View style={{ flex: 1 }}>
+                <StatusBar backgroundColor="#84C1FF" barStyle={'light-content'}/>
+                <TabNavigator tabBarStyle={styles.tab}>
+                    {tabViews}
+                </TabNavigator>
             </View>
-          )}
-          <View style={styles.body}>
-            <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>Step One</Text>
-              <Text style={styles.sectionDescription}>
-                Edit <Text style={styles.highlight}>App.js</Text> to change this
-                screen and then come back to see your edits.
-              </Text>
-            </View>
-            <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>See Your Changes</Text>
-              <Text style={styles.sectionDescription}>
-                <ReloadInstructions />
-              </Text>
-            </View>
-            <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>Debug</Text>
-              <Text style={styles.sectionDescription}>
-                <DebugInstructions />
-              </Text>
-            </View>
-            <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>Learn More</Text>
-              <Text style={styles.sectionDescription}>
-                Read the docs to discover what to do next:
-              </Text>
-            </View>
-            <LearnMoreLinks />
-          </View>
-        </ScrollView>
-      </SafeAreaView>
-    </>
-  );
-};
+        );
+    }
+}
 
 const styles = StyleSheet.create({
-  scrollView: {
-    backgroundColor: Colors.lighter,
-  },
-  engine: {
-    position: 'absolute',
-    right: 0,
-  },
-  body: {
-    backgroundColor: Colors.white,
-  },
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
-  },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-    color: Colors.black,
-  },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
-    color: Colors.dark,
-  },
-  highlight: {
-    fontWeight: '700',
-  },
-  footer: {
-    color: Colors.dark,
-    fontSize: 12,
-    fontWeight: '600',
-    padding: 4,
-    paddingRight: 12,
-    textAlign: 'right',
-  },
+    tab: {
+        height: 55,
+        alignItems: 'center',
+        // position: "absolute",
+    },
+    tabIcon: {
+        width: 25,
+        height: 25,
+        resizeMode: 'stretch',
+        marginTop: 5
+    }
 });
 
-export default App;
+
+const NaviApp = createStackNavigator({
+    App: { screen: AppRoute },
+    SearchPage: { screen: SEARCHPAGE },
+    PddDetail: { screen: PDDetail },
+});
+
+export default createAppContainer(NaviApp);
